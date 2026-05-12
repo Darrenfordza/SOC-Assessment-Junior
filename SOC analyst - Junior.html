@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Junior SOC Analyst Assessment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e14;
+    --surface: #111720;
+    --surface2: #161e2a;
+    --border: #1e2d3d;
+    --border2: #253444;
+    --accent: #00d4ff;
+    --accent2: #0095cc;
+    --accent-dim: rgba(0,212,255,0.08);
+    --accent-glow: rgba(0,212,255,0.15);
+    --text: #cdd6e0;
+    --text-muted: #5a7a8a;
+    --text-dim: #3a5566;
+    --green: #39d353;
+    --green-dim: rgba(57,211,83,0.12);
+    --red: #ff4d4d;
+    --red-dim: rgba(255,77,77,0.1);
+    --amber: #f0a500;
+    --amber-dim: rgba(240,165,0,0.1);
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Radial glow */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -30%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 600px;
+    background: radial-gradient(ellipse, rgba(0,212,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 24px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ---- TOP BAR ---- */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+  .topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+  }
+  .topbar-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .topbar-time {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  /* ---- SCREENS ---- */
+  .screen { display: none; flex-direction: column; flex: 1; padding-bottom: 60px; }
+  .screen.active { display: flex; animation: fadeIn 0.4s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ---- INTRO ---- */
+  .intro-hero { margin-bottom: 48px; }
+  .intro-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .intro-tag::before { content:''; display:inline-block; width:24px; height:1px; background:var(--accent); }
+  .intro-title {
+    font-family: var(--mono);
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 16px;
+  }
+  .intro-title span { color: var(--accent); }
+  .intro-sub {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    max-width: 520px;
+  }
+
+  .domain-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+  .domain-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .domain-card:hover { border-color: var(--border2); background: var(--surface2); }
+  .domain-icon {
+    width: 32px; height: 32px;
+    border-radius: 6px;
+    background: var(--accent-dim);
+    border: 1px solid rgba(0,212,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .domain-icon svg { width: 16px; height: 16px; stroke: var(--accent); fill: none; stroke-width: 1.5; }
+  .domain-info {}
+  .domain-name { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+  .domain-count { font-family: var(--mono); font-size: 11px; color: var(--text-muted); }
+
+  .info-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
+  }
+  .info-pill {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .info-pill span { color: var(--accent); }
+
+  .btn-start {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--bg);
+    background: var(--accent);
+    border: none;
+    border-radius: 6px;
+    padding: 14px 32px;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .btn-start:hover { background: #33deff; box-shadow: 0 0 24px rgba(0,212,255,0.4); }
+  .btn-start:active { transform: scale(0.98); }
+  .btn-start svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+
+  /* ---- QUIZ ---- */
+  .quiz-header { margin-bottom: 32px; }
+  .quiz-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .quiz-domain {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+  }
+  .quiz-counter {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .progress-track {
+    height: 2px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-bottom: 8px;
+  }
+  .progress-fill {
+    height: 2px;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 8px var(--accent);
+  }
+  .progress-dots {
+    display: flex;
+    gap: 4px;
+  }
+  .pdot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--border2);
+    transition: background 0.3s;
+    flex-shrink: 0;
+  }
+  .pdot.done { background: var(--accent); }
+  .pdot.current { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 28px;
+    margin-bottom: 20px;
+  }
+  .q-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+    letter-spacing: 0.1em;
+  }
+  .q-text {
+    font-size: 17px;
+    font-weight: 500;
+    color: #e8f0f5;
+    line-height: 1.6;
+  }
+
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, transform 0.1s;
+    text-align: left;
+    width: 100%;
+  }
+  .opt:hover:not(.selected) { border-color: var(--border2); background: #1a2535; transform: translateX(2px); }
+  .opt:active { transform: scale(0.99); }
+  .opt.selected {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+    box-shadow: inset 0 0 0 1px var(--accent), 0 0 16px rgba(0,212,255,0.08);
+  }
+  .opt-badge {
+    width: 26px; height: 26px;
+    border-radius: 5px;
+    border: 1px solid var(--border2);
+    background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+  .opt.selected .opt-badge {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,212,255,0.12);
+  }
+  .opt-text {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.55;
+    padding-top: 4px;
+  }
+  .opt.selected .opt-text { color: #cde8f5; }
+
+  .quiz-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 24px;
+    gap: 12px;
+  }
+  .btn-nav {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s, background 0.2s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .btn-nav:hover:not(:disabled) { color: var(--text); border-color: var(--border2); background: var(--surface2); }
+  .btn-nav:disabled { opacity: 0.25; cursor: default; }
+  .btn-nav.primary {
+    color: var(--bg);
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .btn-nav.primary:hover { background: #33deff; box-shadow: 0 0 16px rgba(0,212,255,0.3); }
+  .btn-nav svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+  .unanswered-warn {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--amber);
+    background: var(--amber-dim);
+    border: 1px solid rgba(240,165,0,0.25);
+    border-radius: 4px;
+    padding: 8px 14px;
+    margin-top: 12px;
+    display: none;
+  }
+
+  /* ---- RESULTS ---- */
+  .result-hero {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 36px;
+    text-align: center;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .result-hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%; transform: translateX(-50%);
+    width: 300px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+  .result-score-wrap { margin-bottom: 16px; }
+  .result-score {
+    font-family: var(--mono);
+    font-size: 72px;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1;
+  }
+  .result-score-denom {
+    font-family: var(--mono);
+    font-size: 24px;
+    color: var(--text-muted);
+  }
+  .result-pct {
+    font-family: var(--mono);
+    font-size: 18px;
+    color: var(--accent);
+    margin-top: 4px;
+  }
+  .result-verdict {
+    font-size: 15px;
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-top: 12px;
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.06em;
+  }
+  .verdict-strong { background: var(--green-dim); color: var(--green); border: 1px solid rgba(57,211,83,0.25); }
+  .verdict-mid { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(240,165,0,0.25); }
+  .verdict-low { background: var(--red-dim); color: var(--red); border: 1px solid rgba(255,77,77,0.2); }
+
+  .breakdown-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+  .breakdown-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 12px;
+    text-align: center;
+  }
+  .breakdown-score {
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .breakdown-bar-track {
+    height: 2px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 8px 0;
+  }
+  .breakdown-bar-fill {
+    height: 2px;
+    border-radius: 2px;
+    background: var(--accent);
+  }
+  .breakdown-name {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  .section-label-lg {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-label-lg::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  .filter-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .ftab {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .ftab:hover { color: var(--text); border-color: var(--border2); }
+  .ftab.active { color: var(--accent); border-color: var(--accent); background: var(--accent-dim); }
+
+  .review-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 10px;
+    transition: border-color 0.2s;
+  }
+  .review-item.correct { border-left: 3px solid var(--green); }
+  .review-item.wrong { border-left: 3px solid var(--red); }
+  .review-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .review-qnum {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+  }
+  .review-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 3px;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+  .badge-correct { background: var(--green-dim); color: var(--green); }
+  .badge-wrong { background: var(--red-dim); color: var(--red); }
+  .review-q { font-size: 14px; font-weight: 500; color: #d8e8f0; margin-bottom: 12px; line-height: 1.55; }
+  .review-answers { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+  .answer-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 12px;
+  }
+  .answer-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .label-correct { background: var(--green-dim); color: var(--green); }
+  .label-yours { background: var(--red-dim); color: var(--red); }
+  .label-yours-ok { background: var(--green-dim); color: var(--green); }
+  .answer-text { color: var(--text-muted); line-height: 1.5; }
+  .review-why {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    background: var(--surface2);
+    border-left: 2px solid var(--border2);
+    padding: 10px 14px;
+    border-radius: 0 6px 6px 0;
+  }
+  .review-why strong { color: var(--text-dim); font-weight: 500; font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; display: block; margin-bottom: 4px; }
+
+  .result-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+  }
+  .btn-action {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    border-radius: 6px;
+    padding: 12px 24px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .btn-action:hover { color: var(--text); border-color: var(--border2); background: var(--surface2); }
+  .btn-action.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+  }
+  .btn-action.primary:hover { background: #33deff; box-shadow: 0 0 20px rgba(0,212,255,0.35); }
+  .btn-action svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(5,10,18,0.85);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.show { display: flex; animation: fadeIn 0.25s ease; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 32px;
+    max-width: 440px;
+    width: 100%;
+  }
+  .modal h3 { font-family: var(--mono); font-size: 15px; color: #fff; margin-bottom: 10px; }
+  .modal p { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px; }
+  .modal-btns { display: flex; gap: 10px; justify-content: flex-end; }
+
+  /* Print */
+  @media print {
+    body::before, body::after { display:none; }
+    .topbar, .result-actions, .filter-tabs { display:none; }
+    .review-item { break-inside: avoid; }
+  }
+
+  @media (max-width: 520px) {
+    .intro-title { font-size: 26px; }
+    .result-score { font-size: 52px; }
+    .q-card { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-dot"></div>
+      SOC ANALYST ASSESSMENT
+    </div>
+    <div class="topbar-time" id="clock"></div>
+  </header>
+
+  <!-- INTRO SCREEN -->
+  <div class="screen active" id="intro-screen">
+    <div class="intro-hero">
+      <div class="intro-tag">RECRUITMENT TOOL</div>
+      <h1 class="intro-title">Junior SOC Analyst<br><span>Questionnaire</span></h1>
+      <p class="intro-sub">A 20-question self-assessment covering foundational security operations knowledge. Scored automatically across five core domains.</p>
+    </div>
+
+    <div class="domain-grid">
+      <div class="domain-card">
+        <div class="domain-icon">
+          <svg viewBox="0 0 24 24"><path d="M2 12h4M18 12h4M12 2v4M12 18v4"/><circle cx="12" cy="12" r="4"/><path d="M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M19.07 4.93l-2.83 2.83M7.76 16.24l-2.83 2.83"/></svg>
+        </div>
+        <div class="domain-info">
+          <div class="domain-name">Network security</div>
+          <div class="domain-count">4 questions</div>
+        </div>
+      </div>
+      <div class="domain-card">
+        <div class="domain-icon">
+          <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div class="domain-info">
+          <div class="domain-name">Incident response</div>
+          <div class="domain-count">4 questions</div>
+        </div>
+      </div>
+      <div class="domain-card">
+        <div class="domain-icon">
+          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        </div>
+        <div class="domain-info">
+          <div class="domain-name">SIEM & log analysis</div>
+          <div class="domain-count">4 questions</div>
+        </div>
+      </div>
+      <div class="domain-card">
+        <div class="domain-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        </div>
+        <div class="domain-info">
+          <div class="domain-name">Malware & threats</div>
+          <div class="domain-count">4 questions</div>
+        </div>
+      </div>
+      <div class="domain-card">
+        <div class="domain-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="domain-info">
+          <div class="domain-name">Compliance & frameworks</div>
+          <div class="domain-count">4 questions</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-row">
+      <div class="info-pill"><span>20</span> questions</div>
+      <div class="info-pill"><span>5</span> domains</div>
+      <div class="info-pill"><span>~15</span> min estimated</div>
+      <div class="info-pill">Auto-scored</div>
+    </div>
+
+    <button class="btn-start" onclick="startQuiz()">
+      Begin assessment
+      <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div class="screen" id="quiz-screen">
+    <div class="quiz-header">
+      <div class="quiz-meta">
+        <div class="quiz-domain" id="quiz-domain">NETWORK SECURITY</div>
+        <div class="quiz-counter" id="quiz-counter">01 / 20</div>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="prog-fill" style="width:5%"></div>
+      </div>
+      <div class="progress-dots" id="prog-dots"></div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-num" id="q-num">Q01 — NETWORK SECURITY</div>
+      <div class="q-text" id="q-text"></div>
+    </div>
+
+    <div class="options" id="options-list"></div>
+
+    <div class="quiz-nav">
+      <button class="btn-nav" id="btn-prev" onclick="navigate(-1)">
+        <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Previous
+      </button>
+      <button class="btn-nav primary" id="btn-next" onclick="navigate(1)">
+        Next
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+    <div class="unanswered-warn" id="warn-msg"></div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div class="screen" id="result-screen">
+    <div class="result-hero">
+      <div class="result-score-wrap">
+        <span class="result-score" id="res-score">0</span>
+        <span class="result-score-denom">/20</span>
+      </div>
+      <div class="result-pct" id="res-pct">0%</div>
+      <div class="result-verdict" id="res-verdict"></div>
+    </div>
+
+    <div class="section-label-lg">DOMAIN BREAKDOWN</div>
+    <div class="breakdown-grid" id="breakdown-grid"></div>
+
+    <div class="section-label-lg">ANSWER REVIEW</div>
+    <div class="filter-tabs">
+      <button class="ftab active" onclick="filterReview('all',this)">All questions</button>
+      <button class="ftab" onclick="filterReview('wrong',this)">Incorrect only</button>
+      <button class="ftab" onclick="filterReview('correct',this)">Correct only</button>
+    </div>
+    <div id="review-list"></div>
+
+    <div class="result-actions">
+      <button class="btn-action primary" onclick="printResults()">
+        <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print / Save PDF
+      </button>
+      <button class="btn-action" onclick="showResetModal()">
+        <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.48"/></svg>
+        Retake assessment
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Reset modal -->
+<div class="modal-overlay" id="reset-modal">
+  <div class="modal">
+    <h3>Retake assessment?</h3>
+    <p>All answers will be cleared and you'll start from the beginning. Your current results will be lost.</p>
+    <div class="modal-btns">
+      <button class="btn-action" onclick="closeModal()">Cancel</button>
+      <button class="btn-action primary" onclick="resetQuiz()">Retake</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Raw question bank — correct answer always stored as `correct` text, options shuffled at runtime
+const questionBank = [
+  // ── Network security ──
+  {cat:"Network security",
+   q:"Which protocol operates at the transport layer and provides connection-oriented, reliable data transmission?",
+   correct:"TCP",
+   opts:["UDP","ICMP","TCP","ARP"],
+   why:"TCP (Transmission Control Protocol) operates at Layer 4 and uses a three-way handshake (SYN, SYN-ACK, ACK) to guarantee reliable, ordered, and error-checked delivery of data."},
+  {cat:"Network security",
+   q:"A SOC analyst notices a large volume of outbound DNS queries to random-looking, high-entropy subdomains. What threat does this most likely indicate?",
+   correct:"DNS tunnelling / C2 communication",
+   opts:["DDoS amplification attack","ARP poisoning","BGP hijacking","DNS tunnelling / C2 communication"],
+   why:"DNS tunnelling encodes data within DNS queries and responses to exfiltrate data or communicate with command-and-control (C2) infrastructure. Random-looking subdomains with high entropy are a key indicator."},
+  {cat:"Network security",
+   q:"What does a stateful firewall track that a basic packet-filtering firewall does not?",
+   correct:"Connection state and full session context",
+   opts:["MAC addresses","Port numbers only","Connection state and full session context","Source IP addresses"],
+   why:"Stateful firewalls maintain a connection state table, allowing them to make filtering decisions based on the full session context — not just individual packets in isolation."},
+  {cat:"Network security",
+   q:"Which of the following best describes a man-in-the-middle (MitM) attack?",
+   correct:"An attacker secretly intercepting and potentially altering communications between two parties",
+   opts:["Exploiting a buffer overflow to execute arbitrary code","Brute-forcing SSH credentials until access is gained","Flooding a target with traffic to cause a denial of service","An attacker secretly intercepting and potentially altering communications between two parties"],
+   why:"In a MitM attack the adversary secretly positions themselves between two communicating parties, relaying and potentially modifying their traffic while both parties believe they are communicating directly with each other."},
+  // ── Incident response ──
+  {cat:"Incident response",
+   q:"According to NIST SP 800-61, what is the correct incident response lifecycle phase order?",
+   correct:"Preparation → Detection & Analysis → Containment, Eradication & Recovery → Post-Incident Activity",
+   opts:["Preparation → Detection & Analysis → Containment, Eradication & Recovery → Post-Incident Activity","Detection → Preparation → Recovery → Lessons Learned","Containment → Identification → Eradication → Recovery","Triage → Escalation → Remediation → Closure"],
+   why:"NIST SP 800-61 defines four phases: (1) Preparation, (2) Detection & Analysis, (3) Containment, Eradication & Recovery, and (4) Post-Incident Activity (lessons learned)."},
+  {cat:"Incident response",
+   q:"During the containment phase of an incident, what is the primary goal?",
+   correct:"Prevent further damage while preserving evidence for analysis",
+   opts:["Restore all affected systems to normal operation","Notify law enforcement and regulators","Identify the root cause of the incident","Prevent further damage while preserving evidence for analysis"],
+   why:"The primary goal of containment is to limit the scope and impact of the incident while preserving forensic evidence. This precedes eradication to ensure investigation data is not destroyed."},
+  {cat:"Incident response",
+   q:"An analyst discovers a compromised endpoint is actively exfiltrating sensitive data. What should be done first?",
+   correct:"Isolate the host from the network",
+   opts:["Run a full antivirus scan on the host","Isolate the host from the network","Power off the machine at the wall","Re-image the machine immediately"],
+   why:"Network isolation immediately stops active exfiltration and prevents lateral movement while preserving volatile memory artefacts. Powering off destroys RAM contents needed for forensic analysis."},
+  {cat:"Incident response",
+   q:"What is the primary purpose of maintaining a chain of custody during incident response?",
+   correct:"To document evidence handling and maintain its legal integrity",
+   opts:["To log escalation paths through the IR team","To track analyst working hours during a major incident","To ensure patches are applied in the correct sequence","To document evidence handling and maintain its legal integrity"],
+   why:"Chain of custody documents who collected, handled, and transferred evidence at every stage — this is essential for legal proceedings and demonstrating that evidence has not been tampered with."},
+  // ── SIEM & log analysis ──
+  {cat:"SIEM & log analysis",
+   q:"In a SIEM, what does event correlation primarily enable analysts to do?",
+   correct:"Link related events across disparate sources to surface threat patterns",
+   opts:["Encrypt log data during transmission","Automatically remediate security incidents without intervention","Link related events across disparate sources to surface threat patterns","Compress and archive log data more efficiently"],
+   why:"Correlation rules aggregate and connect events from multiple sources (firewall, IDS, endpoint) to identify patterns that indicate threats — threats that isolated individual events would fail to reveal."},
+  {cat:"SIEM & log analysis",
+   q:"A Windows event log shows Event ID 4625 repeating hundreds of times in 60 seconds from a single source IP. What does this indicate?",
+   correct:"A brute-force or password spraying attack",
+   opts:["Normal scheduled authentication activity","A Windows software update process","A successful privileged account login","A brute-force or password spraying attack"],
+   why:"Event ID 4625 represents a failed Windows logon. Hundreds of failures in rapid succession from one source is a classic indicator of brute-force or password spraying activity."},
+  {cat:"SIEM & log analysis",
+   q:"Which log source is most useful for detecting lateral movement within a Windows environment?",
+   correct:"Windows Security Event Logs — especially IDs 4624, 4648, and 4672",
+   opts:["Firewall deny/drop logs at the perimeter","DNS query logs from the DNS server","Windows Security Event Logs — especially IDs 4624, 4648, and 4672","Web server access logs (IIS/Apache)"],
+   why:"Windows Security Event Logs capture logon success (4624), explicit credential use (4648), and special privilege assignment (4672) — all critical indicators of lateral movement between systems."},
+  {cat:"SIEM & log analysis",
+   q:"What is the key difference between a true positive and a false positive during alert triage?",
+   correct:"A true positive is a real threat correctly detected; a false positive is a benign event wrongly flagged",
+   opts:["A true positive is a real threat correctly detected; a false positive is a benign event wrongly flagged","True positives come from endpoint tools; false positives come from network tools","A true positive means the SIEM rule is well-tuned; a false positive means it is broken","A true positive is low severity; a false positive is high severity"],
+   why:"True positive: genuine malicious activity that was correctly alerted. False positive: legitimate activity incorrectly flagged as malicious. Reducing false positives through tuning improves analyst efficiency without hiding real threats."},
+  // ── Malware & threats ──
+  {cat:"Malware & threats",
+   q:"What distinguishes a rootkit from other malware categories?",
+   correct:"It maintains persistent, stealthy privileged access by hiding itself from the operating system",
+   opts:["It always requires direct user interaction to execute","It exclusively targets web browsers and their stored credentials","It always encrypts files and demands ransom","It maintains persistent, stealthy privileged access by hiding itself from the operating system"],
+   why:"Rootkits are designed to conceal their presence and maintain persistent privileged access by hooking OS-level functions — making them particularly resistant to detection by standard security tools."},
+  {cat:"Malware & threats",
+   q:"Which of the following best describes a 'living off the land' (LotL) attack technique?",
+   correct:"Abusing legitimate built-in OS tools such as PowerShell and WMI to carry out malicious actions",
+   opts:["Conducting SQL injection against a web application database","Abusing legitimate built-in OS tools such as PowerShell and WMI to carry out malicious actions","Deploying ransomware via spear-phishing email attachments","Using zero-day exploits against unpatched systems to gain initial access"],
+   why:"LotL attacks abuse legitimate, trusted tools already present on the system (PowerShell, certutil, wmic, mshta) to evade detection, since these binaries are often whitelisted by security controls."},
+  {cat:"Malware & threats",
+   q:"An analyst observes a process making outbound connections to an external IP every 60 seconds. What malware behaviour does this most suggest?",
+   correct:"Command and control (C2) beaconing",
+   opts:["SQL injection attempts against internal databases","Active keylogging of user input","Ransomware file encryption routine","Command and control (C2) beaconing"],
+   why:"Regular, periodic outbound connections at fixed intervals is the defining characteristic of C2 beaconing — malware checking in with its controller at scheduled intervals awaiting instructions."},
+  {cat:"Malware & threats",
+   q:"What is the primary purpose of a sandbox in malware analysis?",
+   correct:"To execute suspicious files in an isolated environment and observe their behaviour safely",
+   opts:["To execute suspicious files in an isolated environment and observe their behaviour safely","To automatically decrypt and deobfuscate malware code","To block malicious email attachments before delivery","To securely store and quarantine malware samples long-term"],
+   why:"A sandbox executes unknown or suspicious files in a controlled, isolated environment, capturing their runtime behaviours — file system writes, registry changes, network connections — without risk to production systems."},
+  // ── Compliance & frameworks ──
+  {cat:"Compliance & frameworks",
+   q:"Which MITRE ATT&CK tactic describes an adversary maintaining a foothold after initial compromise?",
+   correct:"Persistence",
+   opts:["Lateral Movement","Exfiltration","Persistence","Initial Access"],
+   why:"The Persistence tactic covers techniques adversaries use to maintain access across interruptions such as system restarts or credential changes — for example, registry run keys, scheduled tasks, and startup folder abuse."},
+  {cat:"Compliance & frameworks",
+   q:"Under GDPR, what is the maximum timeframe for notifying a supervisory authority of a personal data breach?",
+   correct:"72 hours",
+   opts:["30 calendar days","72 hours","7 calendar days","24 hours"],
+   why:"GDPR Article 33 requires organisations to notify the relevant supervisory authority of a personal data breach within 72 hours of becoming aware of it, where feasible."},
+  {cat:"Compliance & frameworks",
+   q:"What does the CIA triad represent in information security?",
+   correct:"Confidentiality, Integrity, and Availability",
+   opts:["Control, Identity, and Authorisation","Compliance, Investigation, and Assessment","Cyber Intelligence Agency","Confidentiality, Integrity, and Availability"],
+   why:"The CIA triad is the foundational information security model: Confidentiality (only authorised parties access data), Integrity (data is accurate and unaltered), and Availability (systems and data are accessible when needed)."},
+  {cat:"Compliance & frameworks",
+   q:"Which of the following best describes the purpose of the NIST Cybersecurity Framework (CSF)?",
+   correct:"A voluntary risk-based framework providing guidelines to manage and reduce cybersecurity risk",
+   opts:["A legal toolkit for prosecuting cybercriminals internationally","A mandatory legal compliance standard for all US government agencies","A professional certification scheme for cybersecurity practitioners","A voluntary risk-based framework providing guidelines to manage and reduce cybersecurity risk"],
+   why:"The NIST CSF is a voluntary, risk-based framework built around five functions — Identify, Protect, Detect, Respond, Recover — helping organisations of all sizes manage and reduce cybersecurity risk systematically."},
+];
+
+// Build shuffled questions: randomise option order, track correct answer index
+function buildQuestions() {
+  return questionBank.map(raw => {
+    // Fisher-Yates shuffle a copy of opts
+    const shuffled = [...raw.opts];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return {
+      cat: raw.cat,
+      q: raw.q,
+      opts: shuffled,
+      ans: shuffled.indexOf(raw.correct),
+      why: raw.why
+    };
+  });
+}
+
+const questions = buildQuestions();
+
+const cats = ["Network security","Incident response","SIEM & log analysis","Malware & threats","Compliance & frameworks"];
+let current = 0;
+let answers = new Array(questions.length).fill(null);
+
+// Clock
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent = now.toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+updateClock(); setInterval(updateClock, 1000);
+
+// Progress dots
+function buildDots() {
+  const wrap = document.getElementById('prog-dots');
+  wrap.innerHTML = '';
+  questions.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'pdot' + (i === current ? ' current' : (answers[i] !== null ? ' done' : ''));
+    wrap.appendChild(d);
+  });
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startQuiz() {
+  // Rebuild with freshly shuffled options on every attempt
+  const fresh = buildQuestions();
+  for (let i = 0; i < questions.length; i++) questions[i] = fresh[i];
+  current = 0;
+  answers = new Array(questions.length).fill(null);
+  showScreen('quiz-screen');
+  renderQ();
+}
+
+function renderQ() {
+  const q = questions[current];
+  const pct = Math.round(((current + 1) / questions.length) * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('quiz-domain').textContent = q.cat.toUpperCase();
+  document.getElementById('quiz-counter').textContent = String(current+1).padStart(2,'0') + ' / ' + questions.length;
+  document.getElementById('q-num').textContent = 'Q' + String(current+1).padStart(2,'0') + ' — ' + q.cat.toUpperCase();
+  document.getElementById('q-text').textContent = q.q;
+
+  const letters = ['A','B','C','D'];
+  const ol = document.getElementById('options-list');
+  ol.innerHTML = '';
+  q.opts.forEach((o, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt' + (answers[current] === i ? ' selected' : '');
+    btn.innerHTML = `<span class="opt-badge">${letters[i]}</span><span class="opt-text">${o}</span>`;
+    btn.onclick = () => selectOpt(i);
+    ol.appendChild(btn);
+  });
+
+  document.getElementById('btn-prev').disabled = current === 0;
+  const isLast = current === questions.length - 1;
+  const nb = document.getElementById('btn-next');
+  if (isLast) {
+    nb.innerHTML = 'Submit <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2"><polyline points="20 6 9 17 4 12"/></svg>';
+    nb.onclick = trySubmit;
+  } else {
+    nb.innerHTML = 'Next <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+    nb.onclick = () => navigate(1);
+  }
+  document.getElementById('warn-msg').style.display = 'none';
+  buildDots();
+}
+
+function selectOpt(i) {
+  answers[current] = i;
+  renderQ();
+}
+
+function navigate(dir) {
+  current = Math.max(0, Math.min(questions.length - 1, current + dir));
+  renderQ();
+}
+
+function trySubmit() {
+  const unanswered = answers.filter(a => a === null).length;
+  if (unanswered > 0) {
+    const warn = document.getElementById('warn-msg');
+    warn.textContent = `⚠ ${unanswered} question${unanswered>1?'s':''} unanswered. Navigate back to complete, or submit anyway.`;
+    warn.style.display = 'block';
+    // Add submit-anyway button if not present
+    if (!document.getElementById('force-submit')) {
+      const fb = document.createElement('button');
+      fb.id = 'force-submit';
+      fb.className = 'btn-nav';
+      fb.style.marginTop = '8px';
+      fb.textContent = 'Submit anyway';
+      fb.onclick = submitQuiz;
+      warn.after(fb);
+    }
+    return;
+  }
+  submitQuiz();
+}
+
+function submitQuiz() {
+  showScreen('result-screen');
+  showResults();
+  const fb = document.getElementById('force-submit');
+  if (fb) fb.remove();
+}
+
+function showResults() {
+  let total = 0;
+  const catData = {};
+  cats.forEach(c => catData[c] = {got:0, total:0});
+  questions.forEach((q, i) => {
+    catData[q.cat].total++;
+    if (answers[i] === q.ans) { total++; catData[q.cat].got++; }
+  });
+
+  document.getElementById('res-score').textContent = total;
+  const pct = Math.round((total / questions.length) * 100);
+  document.getElementById('res-pct').textContent = pct + '%';
+
+  const v = document.getElementById('res-verdict');
+  if (pct >= 85) { v.textContent = 'Strong candidate'; v.className = 'result-verdict verdict-strong'; }
+  else if (pct >= 65) { v.textContent = 'Promising — further development recommended'; v.className = 'result-verdict verdict-mid'; }
+  else { v.textContent = 'Needs significant development'; v.className = 'result-verdict verdict-low'; }
+
+  const bg = document.getElementById('breakdown-grid');
+  bg.innerHTML = cats.map(c => {
+    const s = catData[c];
+    const p = Math.round((s.got/s.total)*100);
+    return `<div class="breakdown-card">
+      <div class="breakdown-score">${s.got}/${s.total}</div>
+      <div class="breakdown-bar-track"><div class="breakdown-bar-fill" style="width:${p}%"></div></div>
+      <div class="breakdown-name">${c}</div>
+    </div>`;
+  }).join('');
+
+  renderReview('all');
+}
+
+function filterReview(type, el) {
+  document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderReview(type);
+}
+
+function renderReview(filter) {
+  const letters = ['A','B','C','D'];
+  let html = '';
+  questions.forEach((q, i) => {
+    const correct = answers[i] === q.ans;
+    if (filter === 'wrong' && correct) return;
+    if (filter === 'correct' && !correct) return;
+
+    const ua = answers[i];
+    let answerRows = '';
+    if (!correct && ua !== null) {
+      answerRows += `<div class="answer-row"><span class="answer-label label-yours">YOUR ANSWER</span><span class="answer-text">${letters[ua]}. ${q.opts[ua]}</span></div>`;
+      answerRows += `<div class="answer-row"><span class="answer-label label-correct">CORRECT</span><span class="answer-text">${letters[q.ans]}. ${q.opts[q.ans]}</span></div>`;
+    } else if (!correct && ua === null) {
+      answerRows += `<div class="answer-row"><span class="answer-label label-yours">NOT ANSWERED</span><span class="answer-text" style="color:var(--text-dim)">—</span></div>`;
+      answerRows += `<div class="answer-row"><span class="answer-label label-correct">CORRECT</span><span class="answer-text">${letters[q.ans]}. ${q.opts[q.ans]}</span></div>`;
+    } else {
+      answerRows += `<div class="answer-row"><span class="answer-label label-yours-ok">CORRECT</span><span class="answer-text">${letters[q.ans]}. ${q.opts[q.ans]}</span></div>`;
+    }
+
+    html += `<div class="review-item ${correct?'correct':'wrong'}">
+      <div class="review-top">
+        <div class="review-qnum">Q${String(i+1).padStart(2,'0')} · ${q.cat.toUpperCase()}</div>
+        <span class="review-badge ${correct?'badge-correct':'badge-wrong'}">${correct?'✓ CORRECT':'✗ INCORRECT'}</span>
+      </div>
+      <div class="review-q">${q.q}</div>
+      <div class="review-answers">${answerRows}</div>
+      <div class="review-why"><strong>EXPLANATION</strong>${q.why}</div>
+    </div>`;
+  });
+
+  if (!html) html = `<p style="font-size:13px;color:var(--text-dim);font-family:var(--mono);">No questions match this filter.</p>`;
+  document.getElementById('review-list').innerHTML = html;
+}
+
+function printResults() { window.print(); }
+
+function showResetModal() { document.getElementById('reset-modal').classList.add('show'); }
+function closeModal() { document.getElementById('reset-modal').classList.remove('show'); }
+function resetQuiz() { closeModal(); startQuiz(); }
+
+// Close modal on overlay click
+document.getElementById('reset-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
